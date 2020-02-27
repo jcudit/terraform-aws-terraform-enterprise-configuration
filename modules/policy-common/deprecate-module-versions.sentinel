@@ -1,0 +1,62 @@
+# This policy prevents the use of deprecated modules using the tfconfig import
+
+##### Imports #####
+import "tfconfig"
+import "strings"
+
+##### Lists #####
+
+# Map of module names to deprecated module version regex matchers
+# https://docs.hashicorp.com/sentinel/language/boolexpr/#matches-operator
+deprecated_versions = {
+  "foundation-minimal/aws": "^v0.0.[321]$",
+}
+
+##### Functions #####
+
+# Find all modules and their versions
+module_versions = func() {
+
+  # Accumulate versions
+  versions = {}
+
+  # Iterate over all modules in the tfconfig import
+  for tfconfig.module_paths as path {
+    # Iterate over the modules to validate versions
+    for tfconfig.module(path).modules else {} as name, m {
+      # Get the version of the root module
+      if length(path) == 0 {
+        # root module
+        source_suffix = strings.split(m.source, "/")[2:]
+        short_name = strings.join(source_suffix, "/")
+        versions[short_name] = m.version
+      }
+    }
+  }
+
+  return versions
+}
+
+# Validate that deprecated modules are not present
+validate_versions = func(deprecated_versions) {
+  valid = true
+
+  for module_versions() as name, version {
+    print("Module", name, "with version", version, "was found")
+    deprecated_version = deprecated_versions[name] else ""
+    if length(deprecated_version) > 0 and version matches deprecated_version {
+      print("Deprecated version matching", deprecated_version, "found for", name)
+      valid = false
+    }
+  }
+
+  return valid
+}
+
+##### Rules #####
+
+# Main rule
+module_versions_validated = validate_versions(deprecated_versions)
+main = rule {
+  module_versions_validated
+}

@@ -1,0 +1,1773 @@
+import "strings"
+import "types"
+
+_modules = {
+	"root": {
+		"data": {},
+		"modules": {
+			"database": {
+				"config": {
+					"name":     "ptfe",
+					"username": "ptfe",
+				},
+				"references": {
+					"db_subnet_group_name": [
+						"module.foundation.db_subnet_group_name",
+					],
+					"environment": [
+						"var.environment",
+					],
+					"name": [],
+					"password": [
+						"random_string.database_password",
+					],
+					"region": [
+						"var.region",
+					],
+					"service": [
+						"var.service",
+					],
+					"sg_ids": [
+						"module.foundation.default_security_group_id",
+					],
+					"subnet_ids": [
+						"module.foundation.subnet_ids",
+					],
+					"username": [],
+				},
+				"source":  "terraform-staging.githubapp.com/github-staging/database/aws",
+				"version": "v0.0.6",
+			},
+			"foundation": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"region": [
+						"var.region",
+					],
+					"service": [
+						"var.service",
+					],
+				},
+				"source":  "terraform-staging.githubapp.com/github-staging/foundation-minimal/aws",
+				"version": "v0.0.4",
+			},
+			"policy": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"organization_name": [
+						"var.environment",
+					],
+					"region": [
+						"var.region",
+					],
+				},
+				"source":  "terraform-staging.githubapp.com/github-staging/terraform-enterprise-policy/aws",
+				"version": "0.0.5",
+			},
+			"service": {
+				"config": {
+					"owner": "github/compute-foundation",
+					"ttl":   "99",
+				},
+				"references": {
+					"database_endpoint": [
+						"module.database.object",
+					],
+					"database_password": [
+						"random_string.database_password",
+					],
+					"environment": [
+						"var.environment",
+					],
+					"owner": [],
+					"region": [
+						"var.region",
+					],
+					"sg_ids": [
+						"module.foundation.default_security_group_id",
+					],
+					"subnet_ids": [
+						"module.foundation.subnet_ids",
+					],
+					"ttl": [],
+					"vpc_id": [
+						"module.foundation.vpc_id",
+					],
+				},
+				"source":  "terraform-staging.githubapp.com/github-staging/terraform-enterprise/aws",
+				"version": "v0.0.9",
+			},
+		},
+		"outputs": {
+			"aws_alb_dns_name": {
+				"depends_on":  [],
+				"description": "The DNS name for the ALB this module creates",
+				"references": [
+					"module.service.aws_alb_dns_name",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"instance_hostnames": {
+				"depends_on":  [],
+				"description": "Instance hostnames for Terraform Enterprise frontends",
+				"references": [
+					"module.service.instance_hostnames",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"private_key_content": {
+				"depends_on":  [],
+				"description": "Private key used for SSH access to instances",
+				"references": [
+					"module.service.private_key_content",
+				],
+				"sensitive": true,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"random_string": {
+				"database_password": {
+					"config": {
+						"length":  16,
+						"special": false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"special": [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+			"service": {
+				"default":     null,
+				"description": "The name of the service that owns this VPC",
+			},
+			"tags": {
+				"default":     {},
+				"description": "Tags to be opportunistically passed to created resources",
+			},
+		},
+	},
+
+	"module.database": {
+		"data":    {},
+		"modules": {},
+		"outputs": {
+			"id": {
+				"depends_on":  [],
+				"description": "The ID of an `aws_db_instance` created by this module",
+				"references": [
+					"aws_db_instance.database",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"object": {
+				"depends_on":  [],
+				"description": "A `aws_db_instance` JSON object",
+				"references": [
+					"aws_db_instance.database",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"aws_db_instance": {
+				"database": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"allocated_storage": [
+							"var.allocated_storage",
+						],
+						"db_subnet_group_name": [
+							"var.db_subnet_group_name",
+						],
+						"engine": [
+							"var.engine",
+						],
+						"engine_version": [
+							"var.engine_version",
+						],
+						"final_snapshot_identifier": [
+							"var.name",
+							"random_string.snapshot",
+						],
+						"identifier_prefix": [
+							"var.name",
+						],
+						"instance_class": [
+							"var.instance_class",
+						],
+						"name": [
+							"var.name",
+						],
+						"password": [
+							"var.password",
+						],
+						"storage_type": [
+							"var.storage_type",
+						],
+						"username": [
+							"var.username",
+						],
+						"vpc_security_group_ids": [
+							"var.sg_ids",
+						],
+					},
+				},
+			},
+			"random_string": {
+				"snapshot": {
+					"config": {
+						"length":  6,
+						"special": false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"special": [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"allocated_storage": {
+				"default":     10,
+				"description": "Allocated storage of a `aws_db_instance` in GB",
+			},
+			"db_subnet_group_name": {
+				"default":     null,
+				"description": "The subnet group name used to secure this module",
+			},
+			"engine": {
+				"default":     "postgres",
+				"description": "Engine of a `aws_db_instance`",
+			},
+			"engine_version": {
+				"default":     "10.10",
+				"description": "Engine version of a `aws_db_instance`",
+			},
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"instance_class": {
+				"default":     "db.t2.medium",
+				"description": "Instance class of a `aws_db_instance`",
+			},
+			"name": {
+				"default":     null,
+				"description": "The name for a `aws_db_instance` resource",
+			},
+			"password": {
+				"default":     null,
+				"description": "The password for a `aws_db_instance` resource",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+			"service": {
+				"default":     null,
+				"description": "The service this database will be owned by",
+			},
+			"sg_ids": {
+				"default":     null,
+				"description": "The security group IDs used to secure this module",
+			},
+			"storage_type": {
+				"default":     "gp2",
+				"description": "Storage type of a `aws_db_instance`",
+			},
+			"subnet_ids": {
+				"default":     null,
+				"description": "The subnet IDs applicable to this module",
+			},
+			"tags": {
+				"default":     {},
+				"description": "Tags to be opportunistically passed to created resources",
+			},
+			"username": {
+				"default":     null,
+				"description": "The username for a `aws_db_instance` resource",
+			},
+		},
+	},
+
+	"module.foundation": {
+		"data": {
+			"aws_availability_zones": {
+				"available": {
+					"config": {
+						"state": "available",
+					},
+					"provisioners": null,
+					"references": {
+						"state": [],
+					},
+				},
+			},
+		},
+		"modules": {},
+		"outputs": {
+			"db_subnet_group_name": {
+				"depends_on":  [],
+				"description": "The database subnet group name of the VPC created by this module",
+				"references": [
+					"aws_db_subnet_group.main",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"default_security_group_id": {
+				"depends_on":  [],
+				"description": "The default security group ID of the VPC created by this module",
+				"references": [
+					"aws_security_group.main",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"object": {
+				"depends_on":  [],
+				"description": "The VPC object created by this module",
+				"references": [
+					"aws_vpc.main",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"subnet_ids": {
+				"depends_on":  [],
+				"description": "The subnet IDs of the VPC created by this module",
+				"references": [
+					"aws_subnet.main",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"vpc_id": {
+				"depends_on":  [],
+				"description": "The ID of the VPC created by this module",
+				"references": [
+					"aws_vpc.main",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"aws_db_subnet_group": {
+				"main": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"description": [
+							"var.service",
+							"random_string.id",
+						],
+						"subnet_ids": [
+							"aws_subnet.main",
+						],
+					},
+				},
+			},
+			"aws_internet_gateway": {
+				"main": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"vpc_id": [
+							"aws_vpc.main",
+						],
+					},
+				},
+			},
+			"aws_route_table": {
+				"main": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"vpc_id": [
+							"aws_vpc.main",
+						],
+					},
+				},
+			},
+			"aws_route_table_association": {
+				"main": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"route_table_id": [
+							"aws_route_table.main",
+						],
+						"subnet_id": [
+							"aws_subnet.main",
+							"count.index",
+						],
+					},
+				},
+			},
+			"aws_security_group": {
+				"main": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"description": [
+							"local.id",
+						],
+						"name": [
+							"local.id",
+						],
+						"vpc_id": [
+							"aws_vpc.main",
+						],
+					},
+				},
+			},
+			"aws_subnet": {
+				"main": {
+					"config": {
+						"map_public_ip_on_launch": true,
+					},
+					"provisioners": null,
+					"references": {
+						"availability_zone": [
+							"data.aws_availability_zones.available",
+							"count.index",
+						],
+						"cidr_block": [
+							"count.index",
+						],
+						"map_public_ip_on_launch": [],
+						"vpc_id": [
+							"aws_vpc.main",
+						],
+					},
+				},
+			},
+			"aws_vpc": {
+				"main": {
+					"config": {
+						"cidr_block":           "10.0.0.0/16",
+						"enable_dns_hostnames": true,
+					},
+					"provisioners": null,
+					"references": {
+						"cidr_block":           [],
+						"enable_dns_hostnames": [],
+					},
+				},
+			},
+			"random_string": {
+				"id": {
+					"config": {
+						"length":  6,
+						"special": false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"special": [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+			"service": {
+				"default":     null,
+				"description": "The service this module will support as a foundation",
+			},
+			"tags": {
+				"default":     {},
+				"description": "Tags to be opportunistically passed to created resources",
+			},
+		},
+	},
+
+	"module.policy": {
+		"data": {},
+		"modules": {
+			"policy-common": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"organization_name": [
+						"var.organization_name",
+					],
+					"region": [
+						"var.region",
+					],
+				},
+				"source":  "./modules/policy-common",
+				"version": "",
+			},
+			"teams": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"organization_name": [
+						"var.organization_name",
+					],
+				},
+				"source":  "./modules/teams",
+				"version": "",
+			},
+		},
+		"outputs": {
+			"enabled_policies_common": {
+				"depends_on":  [],
+				"description": "A mapping of common policy names to policy descriptions",
+				"references": [
+					"module.policy-common.enabled_policies",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"team_names": {
+				"depends_on":  [],
+				"description": "A list of team names managed by this module",
+				"references": [
+					"module.teams.team_names",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {
+			"tfe": {
+				"alias":  {},
+				"config": {},
+				"references": {
+					"hostname": [
+						"var.environment",
+					],
+				},
+				"version": "",
+			},
+		},
+		"resources": {},
+		"variables": {
+			"enabled_policies": {
+				"default": {
+					"validate-all-variables-have-descriptions": "variables have descriptions",
+				},
+				"description": "A mapping of policy name to policy description used to enable policies",
+			},
+			"environment": {
+				"default":     null,
+				"description": "The environment this policy will run within",
+			},
+			"organization_name": {
+				"default":     null,
+				"description": "The name of the organization this module manages",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this policy will run within",
+			},
+		},
+	},
+
+	"module.policy.module.policy-common": {
+		"data":    {},
+		"modules": {},
+		"outputs": {
+			"enabled_policies": {
+				"depends_on":  [],
+				"description": "A mapping of common policy names to policy descriptions",
+				"references": [
+					"var.enabled_policies",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"tfe_sentinel_policy": {
+				"variable_description_present": {
+					"config": {
+						"enforce_mode": "advisory",
+					},
+					"provisioners": null,
+					"references": {
+						"description": [
+							"each.value",
+						],
+						"enforce_mode": [],
+						"name": [
+							"each.key",
+						],
+						"organization": [
+							"var.organization_name",
+						],
+						"policy": [
+							"path.module",
+							"each.key",
+						],
+					},
+				},
+			},
+		},
+		"variables": {
+			"enabled_policies": {
+				"default": {
+					"validate-all-variables-have-descriptions": "variables have descriptions",
+				},
+				"description": "A mapping of policy name to policy description used to enable policies",
+			},
+			"environment": {
+				"default":     null,
+				"description": "The environment this policy will run within",
+			},
+			"organization_name": {
+				"default":     null,
+				"description": "The name of the organization this module manages",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this policy will run within",
+			},
+		},
+	},
+
+	"module.policy.module.teams": {
+		"data":    {},
+		"modules": {},
+		"outputs": {
+			"team_names": {
+				"depends_on":  [],
+				"description": "A list of team names managed by this module",
+				"references": [
+					"tfe_team.managed_teams",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"tfe_team": {
+				"managed_teams": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"name": [
+							"var.team_names",
+							"count.index",
+						],
+						"organization": [
+							"var.organization_name",
+						],
+					},
+				},
+			},
+		},
+		"variables": {
+			"environment": {
+				"default":     null,
+				"description": "Terraform Enterprise environment this module configures",
+			},
+			"organization_name": {
+				"default":     null,
+				"description": "The name of the organization this module manages",
+			},
+			"team_names": {
+				"default": [
+					"compute-foundation",
+					"security-ops",
+					"data-liberation",
+				],
+				"description": "The list of teams declaratively managed by this module",
+			},
+		},
+	},
+
+	"module.service": {
+		"data": {},
+		"modules": {
+			"alb": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"hostname": [
+						"var.environment",
+					],
+					"instance_ids": [
+						"module.compute.instance_ids",
+					],
+					"sg_ids": [
+						"var.sg_ids",
+					],
+					"subnet_ids": [
+						"var.subnet_ids",
+					],
+					"vpc_id": [
+						"var.vpc_id",
+					],
+				},
+				"source":  "./modules/alb",
+				"version": "",
+			},
+			"compute": {
+				"config": {},
+				"references": {
+					"database_endpoint": [
+						"var.database_endpoint",
+					],
+					"database_password": [
+						"var.database_password",
+					],
+					"environment": [
+						"var.environment",
+					],
+					"license_s3_bucket_id": [
+						"module.license.license_s3_bucket_id",
+					],
+					"owner": [
+						"var.owner",
+					],
+					"region": [
+						"var.region",
+					],
+					"sg_ids": [
+						"var.sg_ids",
+					],
+					"subnet_ids": [
+						"var.subnet_ids",
+					],
+					"ttl": [
+						"var.ttl",
+					],
+				},
+				"source":  "./modules/compute",
+				"version": "",
+			},
+			"license": {
+				"config": {},
+				"references": {
+					"environment": [
+						"var.environment",
+					],
+					"region": [
+						"var.region",
+					],
+				},
+				"source":  "./modules/license",
+				"version": "",
+			},
+		},
+		"outputs": {
+			"aws_alb_dns_name": {
+				"depends_on":  [],
+				"description": "The DNS name for the ALB this module creates",
+				"references": [
+					"module.alb.aws_alb_dns_name",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"instance_hostnames": {
+				"depends_on":  [],
+				"description": "Instance hostnames for Terraform Enterprise frontends",
+				"references": [
+					"module.compute.instance_hostnames",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"instance_ids": {
+				"depends_on":  [],
+				"description": "Instances where TFE is running",
+				"references": [
+					"module.compute.instance_ids",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"license_s3_bucket_id": {
+				"depends_on":  [],
+				"description": "The bucket the application license is stored in",
+				"references": [
+					"module.license.license_s3_bucket_id",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"private_key_content": {
+				"depends_on":  [],
+				"description": "Private key used for SSH access to instances",
+				"references": [
+					"module.compute.private_key_content",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"private_key_filename": {
+				"depends_on":  [],
+				"description": "Path to private key used for SSH access to instances",
+				"references": [
+					"module.compute.private_key_filename",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"random_string": {
+				"id": {
+					"config": {
+						"length":  6,
+						"number":  false,
+						"special": false,
+						"upper":   false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"number":  [],
+						"special": [],
+						"upper":   [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"database_endpoint": {
+				"default":     null,
+				"description": "The database endpoint used by this module during runtime",
+			},
+			"database_password": {
+				"default":     null,
+				"description": "The password for a `aws_db_instance` resource",
+			},
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"owner": {
+				"default":     null,
+				"description": "An owning team for the AWS instances created by this module",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+			"sg_ids": {
+				"default":     null,
+				"description": "The security group IDs applicable to this module",
+			},
+			"subnet_ids": {
+				"default":     null,
+				"description": "The subnet IDs applicable to this module",
+			},
+			"tags": {
+				"default": {
+					"Environment": "test",
+				},
+				"description": "Tags to be opportunistically passed to created resources",
+			},
+			"ttl": {
+				"default":     null,
+				"description": "An TTL for the AWS instances created by this module",
+			},
+			"vpc_id": {
+				"default":     null,
+				"description": "The VPC this module will run in",
+			},
+		},
+	},
+
+	"module.service.module.alb": {
+		"data": {
+			"aws_acm_certificate": {
+				"githubapp_cert": {
+					"config": {
+						"domain": "*.githubapp.com",
+					},
+					"provisioners": null,
+					"references": {
+						"domain": [],
+					},
+				},
+			},
+		},
+		"modules": {},
+		"outputs": {
+			"aws_alb_dns_name": {
+				"depends_on":  [],
+				"description": "The DNS name for the ALB this module creates",
+				"references": [
+					"aws_alb.tfe_alb",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"aws_alb": {
+				"tfe_alb": {
+					"config": {
+						"enable_deletion_protection": false,
+						"internal":                   false,
+						"load_balancer_type":         "application",
+					},
+					"provisioners": null,
+					"references": {
+						"enable_deletion_protection": [],
+						"internal":                   [],
+						"load_balancer_type":         [],
+						"name": [
+							"local.alb_name",
+						],
+						"security_groups": [
+							"var.sg_ids",
+						],
+						"subnets": [
+							"var.subnet_ids",
+						],
+						"tags": [
+							"var.environment",
+							"local.alb_name",
+						],
+					},
+				},
+			},
+			"aws_alb_listener": {
+				"tfe_https_app": {
+					"config": {
+						"default_action": [
+							{
+								"type": "forward",
+							},
+						],
+						"port":       "443",
+						"protocol":   "HTTPS",
+						"ssl_policy": "ELBSecurityPolicy-2016-08",
+					},
+					"provisioners": null,
+					"references": {
+						"certificate_arn": [
+							"data.aws_acm_certificate.githubapp_cert",
+						],
+						"default_action": [
+							{
+								"target_group_arn": [
+									"aws_alb_target_group.tfe",
+								],
+								"type": [],
+							},
+						],
+						"load_balancer_arn": [
+							"aws_alb.tfe_alb",
+						],
+						"port":       [],
+						"protocol":   [],
+						"ssl_policy": [],
+					},
+				},
+				"tfe_https_dashboard": {
+					"config": {
+						"default_action": [
+							{
+								"type": "forward",
+							},
+						],
+						"port":       "8800",
+						"protocol":   "HTTPS",
+						"ssl_policy": "ELBSecurityPolicy-2016-08",
+					},
+					"provisioners": null,
+					"references": {
+						"certificate_arn": [
+							"data.aws_acm_certificate.githubapp_cert",
+						],
+						"default_action": [
+							{
+								"target_group_arn": [
+									"aws_alb_target_group.tfe_dashboard",
+								],
+								"type": [],
+							},
+						],
+						"load_balancer_arn": [
+							"aws_alb.tfe_alb",
+						],
+						"port":       [],
+						"protocol":   [],
+						"ssl_policy": [],
+					},
+				},
+				"tfe_redirect_to_https": {
+					"config": {
+						"default_action": [
+							{
+								"redirect": [
+									{
+										"port":        "443",
+										"protocol":    "HTTPS",
+										"status_code": "HTTP_302",
+									},
+								],
+								"type": "redirect",
+							},
+						],
+						"port":     "80",
+						"protocol": "HTTP",
+					},
+					"provisioners": null,
+					"references": {
+						"default_action": [
+							{
+								"redirect": [
+									{
+										"port":        [],
+										"protocol":    [],
+										"status_code": [],
+									},
+								],
+								"type": [],
+							},
+						],
+						"load_balancer_arn": [
+							"aws_alb.tfe_alb",
+						],
+						"port":     [],
+						"protocol": [],
+					},
+				},
+			},
+			"aws_alb_target_group": {
+				"tfe": {
+					"config": {
+						"health_check": [
+							{
+								"healthy_threshold":   5,
+								"interval":            5,
+								"matcher":             "200",
+								"path":                "/_health_check",
+								"port":                "traffic-port",
+								"protocol":            "HTTPS",
+								"timeout":             3,
+								"unhealthy_threshold": 3,
+							},
+						],
+						"port":     443,
+						"protocol": "HTTPS",
+						"stickiness": [
+							{
+								"cookie_duration": 600,
+								"type":            "lb_cookie",
+							},
+						],
+						"target_type": "instance",
+					},
+					"provisioners": null,
+					"references": {
+						"health_check": [
+							{
+								"healthy_threshold":   [],
+								"interval":            [],
+								"matcher":             [],
+								"path":                [],
+								"port":                [],
+								"protocol":            [],
+								"timeout":             [],
+								"unhealthy_threshold": [],
+							},
+						],
+						"port":     [],
+						"protocol": [],
+						"stickiness": [
+							{
+								"cookie_duration": [],
+								"type":            [],
+							},
+						],
+						"target_type": [],
+						"vpc_id": [
+							"var.vpc_id",
+						],
+					},
+				},
+				"tfe_dashboard": {
+					"config": {
+						"health_check": [
+							{
+								"healthy_threshold":   5,
+								"interval":            5,
+								"matcher":             "200",
+								"path":                "/_health_check",
+								"port":                443,
+								"protocol":            "HTTPS",
+								"timeout":             3,
+								"unhealthy_threshold": 3,
+							},
+						],
+						"port":     8800,
+						"protocol": "HTTPS",
+						"stickiness": [
+							{
+								"cookie_duration": 600,
+								"type":            "lb_cookie",
+							},
+						],
+						"target_type": "instance",
+					},
+					"provisioners": null,
+					"references": {
+						"health_check": [
+							{
+								"healthy_threshold":   [],
+								"interval":            [],
+								"matcher":             [],
+								"path":                [],
+								"port":                [],
+								"protocol":            [],
+								"timeout":             [],
+								"unhealthy_threshold": [],
+							},
+						],
+						"port":     [],
+						"protocol": [],
+						"stickiness": [
+							{
+								"cookie_duration": [],
+								"type":            [],
+							},
+						],
+						"target_type": [],
+						"vpc_id": [
+							"var.vpc_id",
+						],
+					},
+				},
+			},
+			"aws_lb_target_group_attachment": {
+				"tfe": {
+					"config": {
+						"port": 443,
+					},
+					"provisioners": null,
+					"references": {
+						"port": [],
+						"target_group_arn": [
+							"aws_alb_target_group.tfe",
+						],
+						"target_id": [
+							"var.instance_ids",
+						],
+					},
+				},
+				"tfe_dashboard": {
+					"config": {
+						"port": 8800,
+					},
+					"provisioners": null,
+					"references": {
+						"port": [],
+						"target_group_arn": [
+							"aws_alb_target_group.tfe_dashboard",
+						],
+						"target_id": [
+							"var.instance_ids",
+						],
+					},
+				},
+			},
+			"random_string": {
+				"id": {
+					"config": {
+						"length":  6,
+						"special": false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"special": [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"hostname": {
+				"default":     null,
+				"description": "The hostname this module will run on",
+			},
+			"instance_ids": {
+				"default":     null,
+				"description": "The instance IDs applicable to this module",
+			},
+			"sg_ids": {
+				"default":     null,
+				"description": "The security group IDs applicable to this module",
+			},
+			"subnet_ids": {
+				"default":     null,
+				"description": "The subnet IDs applicable to this module",
+			},
+			"vpc_id": {
+				"default":     null,
+				"description": "The VPC this module will run in",
+			},
+		},
+	},
+
+	"module.service.module.compute": {
+		"data": {
+			"aws_ami": {
+				"debian": {
+					"config": {
+						"filter": [
+							{
+								"name": "name",
+								"values": [
+									"debian-stretch-hvm-x86_64-gp2-*",
+								],
+							},
+							{
+								"name": "virtualization-type",
+								"values": [
+									"hvm",
+								],
+							},
+						],
+						"most_recent": true,
+						"owners": [
+							"379101102735",
+						],
+					},
+					"provisioners": null,
+					"references": {
+						"filter": [
+							{
+								"name":   [],
+								"values": [],
+							},
+							{
+								"name":   [],
+								"values": [],
+							},
+						],
+						"most_recent": [],
+						"owners":      [],
+					},
+				},
+			},
+			"aws_iam_policy_document": {
+				"ptfe": {
+					"config": {
+						"statement": [
+							{
+								"actions": [
+									"s3:*",
+								],
+								"effect": "Allow",
+								"sid":    "AllowS3",
+							},
+						],
+					},
+					"provisioners": null,
+					"references": {
+						"statement": [
+							{
+								"actions": [],
+								"effect":  [],
+								"resources": [
+									"aws_s3_bucket.pes",
+									"aws_s3_bucket.pes",
+									"var.license_s3_bucket_id",
+									"var.license_s3_bucket_id",
+								],
+								"sid": [],
+							},
+						],
+					},
+				},
+			},
+		},
+		"modules": {},
+		"outputs": {
+			"instance_hostnames": {
+				"depends_on":  [],
+				"description": "Instance hostnames for Terraform Enterprise frontends",
+				"references": [
+					"aws_instance.pes",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"instance_ids": {
+				"depends_on":  [],
+				"description": "Instance IDs for Terraform Enterprise frontends",
+				"references": [
+					"aws_instance.pes",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"private_key_content": {
+				"depends_on":  [],
+				"description": "Private key used for SSH access to instances",
+				"references": [
+					"local_file.private_key_pem",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+			"private_key_filename": {
+				"depends_on":  [],
+				"description": "Path to private key used for SSH access to instances",
+				"references": [
+					"local.private_key_filename",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"aws_iam_instance_profile": {
+				"ptfe": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"name": [
+							"local.db_name",
+						],
+						"role": [
+							"aws_iam_role.ptfe",
+						],
+					},
+				},
+			},
+			"aws_iam_role": {
+				"ptfe": {
+					"config": {
+						"assume_role_policy": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Action\": \"sts:AssumeRole\",\n      \"Principal\": {\n        \"Service\": \"ec2.amazonaws.com\"\n      },\n      \"Effect\": \"Allow\"\n    }\n  ]\n}\n",
+					},
+					"provisioners": null,
+					"references": {
+						"assume_role_policy": [],
+						"name": [
+							"local.db_name",
+						],
+					},
+				},
+			},
+			"aws_iam_role_policy": {
+				"ptfe": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"name": [
+							"local.db_name",
+						],
+						"policy": [
+							"data.aws_iam_policy_document.ptfe",
+						],
+						"role": [
+							"aws_iam_role.ptfe",
+						],
+					},
+				},
+			},
+			"aws_instance": {
+				"pes": {
+					"config": {
+						"root_block_device": [
+							{
+								"volume_size": 80,
+								"volume_type": "gp2",
+							},
+						],
+					},
+					"provisioners": null,
+					"references": {
+						"ami": [
+							"data.aws_ami.debian",
+						],
+						"iam_instance_profile": [
+							"aws_iam_instance_profile.ptfe",
+						],
+						"instance_type": [
+							"var.aws_instance_type",
+						],
+						"key_name": [
+							"local.id",
+						],
+						"root_block_device": [
+							{
+								"volume_size": [],
+								"volume_type": [],
+							},
+						],
+						"subnet_id": [
+							"var.subnet_ids",
+							"count.index",
+						],
+						"tags": [
+							"local.db_name",
+							"count.index",
+							"var.owner",
+							"var.ttl",
+						],
+						"user_data": [
+							"path.module",
+							"var.region",
+							"var.environment",
+							"var.license_s3_bucket_id",
+							"var.database_endpoint",
+							"var.database_password",
+							"var.database_password",
+						],
+						"vpc_security_group_ids": [
+							"var.sg_ids",
+						],
+					},
+				},
+			},
+			"aws_key_pair": {
+				"generated": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"key_name": [
+							"local.id",
+						],
+						"public_key": [
+							"tls_private_key.default",
+						],
+					},
+				},
+			},
+			"aws_s3_bucket": {
+				"pes": {
+					"config": {
+						"acl":           "private",
+						"force_destroy": true,
+						"versioning": [
+							{
+								"enabled": true,
+							},
+						],
+					},
+					"provisioners": null,
+					"references": {
+						"acl": [],
+						"bucket": [
+							"local.db_name",
+						],
+						"force_destroy": [],
+						"tags": [
+							"local.db_name",
+						],
+						"versioning": [
+							{
+								"enabled": [],
+							},
+						],
+					},
+				},
+			},
+			"local_file": {
+				"private_key_pem": {
+					"config":       {},
+					"provisioners": null,
+					"references": {
+						"content": [
+							"tls_private_key.default",
+						],
+						"filename": [
+							"local.private_key_filename",
+						],
+					},
+				},
+			},
+			"null_resource": {
+				"chmod": {
+					"config": {},
+					"provisioners": [
+						{
+							"config": {},
+							"references": {
+								"command": [
+									"local.private_key_filename",
+								],
+							},
+							"type": "local-exec",
+						},
+					],
+					"references": {
+						"triggers": [
+							"local_file.private_key_pem",
+						],
+					},
+				},
+			},
+			"random_string": {
+				"id": {
+					"config": {
+						"length":  5,
+						"number":  false,
+						"special": false,
+						"upper":   false,
+					},
+					"provisioners": null,
+					"references": {
+						"length":  [],
+						"number":  [],
+						"special": [],
+						"upper":   [],
+					},
+				},
+			},
+			"tls_private_key": {
+				"default": {
+					"config": {
+						"algorithm": "RSA",
+					},
+					"provisioners": null,
+					"references": {
+						"algorithm": [],
+					},
+				},
+			},
+		},
+		"variables": {
+			"aws_instance_ami": {
+				"default":     "ami-08328006475c2574b",
+				"description": "The instance AMI this module leverages when creating instances",
+			},
+			"aws_instance_count": {
+				"default":     1,
+				"description": "The number of AWS instances supporting this module",
+			},
+			"aws_instance_type": {
+				"default":     "m5.large",
+				"description": "The instance type this module leverages when creating instances",
+			},
+			"database_endpoint": {
+				"default":     null,
+				"description": "The database endpoint used by this module during runtime",
+			},
+			"database_password": {
+				"default":     null,
+				"description": "The password for a `aws_db_instance` resource",
+			},
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"license_s3_bucket_id": {
+				"default":     null,
+				"description": "Bucket ID where the Terraform Enterprise license is stashed",
+			},
+			"owner": {
+				"default":     null,
+				"description": "An owning team for the AWS instances created by this module",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+			"sg_ids": {
+				"default":     null,
+				"description": "The security group IDs applicable to this module",
+			},
+			"subnet_ids": {
+				"default":     null,
+				"description": "The subnet IDs applicable to this module",
+			},
+			"ttl": {
+				"default":     null,
+				"description": "An TTL for the AWS instances created by this module",
+			},
+		},
+	},
+
+	"module.service.module.license": {
+		"data":    {},
+		"modules": {},
+		"outputs": {
+			"license_s3_bucket_id": {
+				"depends_on":  [],
+				"description": "The bucket the application license is stored in",
+				"references": [
+					"aws_s3_bucket.license",
+				],
+				"sensitive": false,
+				"value":     undefined,
+			},
+		},
+		"providers": {},
+		"resources": {
+			"aws_s3_bucket": {
+				"license": {
+					"config": {
+						"acl":           "private",
+						"force_destroy": true,
+						"versioning": [
+							{
+								"enabled": true,
+							},
+						],
+					},
+					"provisioners": null,
+					"references": {
+						"acl":           [],
+						"force_destroy": [],
+						"region": [
+							"var.region",
+						],
+						"tags": [
+							"var.environment",
+						],
+						"versioning": [
+							{
+								"enabled": [],
+							},
+						],
+					},
+				},
+			},
+			"aws_s3_bucket_object": {
+				"license": {
+					"config": {
+						"key": "license.rli",
+					},
+					"provisioners": null,
+					"references": {
+						"bucket": [
+							"aws_s3_bucket.license",
+						],
+						"etag": [
+							"path.module",
+						],
+						"key": [],
+						"source": [
+							"path.module",
+						],
+					},
+				},
+			},
+		},
+		"variables": {
+			"environment": {
+				"default":     null,
+				"description": "The environment this module will run in",
+			},
+			"region": {
+				"default":     null,
+				"description": "The region this module will run in",
+			},
+		},
+	},
+}
+
+module_paths = [
+	[],
+	[
+		"database",
+	],
+	[
+		"foundation",
+	],
+	[
+		"policy",
+	],
+	[
+		"policy",
+		"policy-common",
+	],
+	[
+		"policy",
+		"teams",
+	],
+	[
+		"service",
+	],
+	[
+		"service",
+		"alb",
+	],
+	[
+		"service",
+		"compute",
+	],
+	[
+		"service",
+		"license",
+	],
+]
+
+module = func(path) {
+	if types.type_of(path) is not "list" {
+		error("expected list, got", types.type_of(path))
+	}
+
+	if length(path) < 1 {
+		return _modules.root
+	}
+
+	addr = []
+	for path as p {
+		append(addr, "module")
+		append(addr, p)
+	}
+
+	return _modules[strings.join(addr, ".")]
+}
+
+data = _modules.root.data
+modules = _modules.root.modules
+providers = _modules.root.providers
+resources = _modules.root.resources
+variables = _modules.root.variables
+outputs = _modules.root.outputs
